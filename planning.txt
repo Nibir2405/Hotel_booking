@@ -1,9 +1,12 @@
 User can see the list of the available Hotels
 User can book a hotel 
 User can get a reservation ticket
-User can get the ReservationTicket into their email
+Generate a ReservationTicket pdf
+User can get the ReservationTicket pdf into their email
 
 Requirements:
+User name
+Staying date
 Classes:
 1. User
 2. Hotel
