@@ -1,9 +1,11 @@
 User can see the list of the available Hotels
 User can book a hotel 
 User can get a reservation ticket
+User can get the ReservationTicket into their email
 
-Requirement:
+Requirements:
 Classes:
 1. User
 2. Hotel
 3. ReservationTicket
+4.Email
