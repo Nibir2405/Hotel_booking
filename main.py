@@ -1,7 +1,7 @@
 import pandas
 
 df = pandas.read_csv("hotels.csv", dtype={"id": str})
-
+df_cards = pandas.read_csv("cards.csv", dtype= str).to_dict(orient="records")
 
 
 class Hotel:
@@ -17,7 +17,7 @@ class Hotel:
     def available(self):
         """Checks if the hotel id is available"""
         availability = df.loc[df["id"]==self.hotel_id, "available"].squeeze()
-        if availability.iloc[0]== "yes":
+        if availability == "yes":
             return True
         else:
             return False
@@ -38,6 +38,19 @@ class ReservationTicket:
         """
         return content
 
+
+class CreditCard:
+    def __init__(self, number):
+        self.number = number
+
+    def validate(self, expiration, holder, cvc):
+        card_number = {"number":self.number, "expiration":expiration, "holder":holder, "cvc":cvc}
+        if card_number in df_cards:
+            return True
+        else:
+            return False
+        
+
 class Email:
     def send(self):
         pass
@@ -47,11 +60,14 @@ print(df)
 hotel_ID = input("Enter the hotel id of the selected hotel: ")
 hotel = Hotel(hotel_ID)
 if hotel.available():
-    hotel.book()
-    name = input("Enter your name: ")
-    reservation_date = input("Enter the date you want to check in: ")
-    reservation_ticket = ReservationTicket(hotel_match=hotel,customer_name=name,date=reservation_date)
-    print(reservation_ticket.generate())
-
+    credit_card = CreditCard(number="1234")
+    if credit_card.validate(expiration="12/26", holder="JOHN SMITH", cvc="123"):
+        hotel.book()
+        name = input("Enter your name: ")
+        reservation_date = input("Enter the date you want to check in: ")
+        reservation_ticket = ReservationTicket(hotel_match=hotel,customer_name=name,date=reservation_date)
+        print(reservation_ticket.generate())
+    else:
+        print("There was a problem with your payment")
 else:
     print("Hotel is not available")
