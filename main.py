@@ -2,7 +2,7 @@ import pandas
 
 df = pandas.read_csv("hotels.csv", dtype={"id": str, "price_per_room":int})
 df_cards = pandas.read_csv("cards.csv", dtype=str).to_dict(orient="records")
-
+df_cards_security = pandas.read_csv("card_security.csv", dtype=str)
 
 class Hotel:
     def __init__(self, hotel_id):
@@ -74,6 +74,16 @@ class CreditCard:
         return False
 
 
+class CreditCardSecurity(CreditCard):
+    
+    def authentication(self,given_pass):
+        password = df_cards_security.loc[(df_cards_security["number"] == self.number), "password"]
+        if not password.empty and password.iloc[0] == given_pass:
+            return True
+        else:
+            return False
+
+
 class Email:
     def send(self):
         pass
@@ -84,13 +94,19 @@ hotel_ID = input("Enter the hotel id of the selected hotel: ")
 hotel = Hotel(hotel_ID)
 
 if hotel.available():
-    credit_card = CreditCard(number="1234", expiration="12/26", holder="JOHN SMITH", cvc="123")
-    if credit_card.validate() and credit_card.pay(hotel_id=hotel_ID):
-        hotel.book()
-        name = input("Enter your name: ")
-        reservation_date = input("Enter the date you want to check in: ")
-        reservation_ticket = ReservationTicket(hotel_match=hotel, customer_name=name, date=reservation_date)
-        print(reservation_ticket.generate())
+    credit_card = CreditCardSecurity(number="1234", expiration="12/26", holder="JOHN SMITH", cvc="123")
+    if credit_card.validate():
+        if credit_card.authentication(given_pass="bypass"):
+            if credit_card.pay(hotel_id=hotel_ID):
+                hotel.book()
+                name = input("Enter your name: ")
+                reservation_date = input("Enter the date you want to check in: ")
+                reservation_ticket = ReservationTicket(hotel_match=hotel, customer_name=name, date=reservation_date)
+                print(reservation_ticket.generate())
+            else:
+                print("You don't have sufficient balance")
+        else:
+            print("Credit card authentication failed")
     else:
         print("There was a problem with your payment")
 else:
