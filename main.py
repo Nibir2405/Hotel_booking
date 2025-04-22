@@ -21,6 +21,11 @@ class Hotel:
             return True
         else:
             return False
+        
+
+class SpaHotel(Hotel):
+    def book_spa_package(self):
+        pass
 
 
 class ReservationTicket:
@@ -47,7 +52,6 @@ class CreditCard:
         self.holder = holder
         self.cvc = cvc
         
-
     def validate(self):
         card_number = {"number": self.number, "expiration":self.expiration, "holder": self.holder, "cvc": self.cvc}
         for card in df_cards:
@@ -74,24 +78,39 @@ class CreditCard:
         return False
 
 
-class CreditCardSecurity(CreditCard):
-    
+class CreditCardSecurity(CreditCard):   
     def authentication(self,given_pass):
         password = df_cards_security.loc[(df_cards_security["number"] == self.number), "password"]
         if not password.empty and password.iloc[0] == given_pass:
             return True
         else:
             return False
+        
 
-
+class SpaTicket:
+    def __init__(self,name,hotel_match):
+        self.name = name
+        self.hotel = hotel_match
+    
+    def generate(self):
+        message = f"""
+        Thank you for your reservation.
+        Here is your Spa booking data:
+        Name: {self.name}
+        Hotel: {self.hotel.name}
+        """
+        return message
+        
+        
 class Email:
     def send(self):
         pass
 
 
+
 print(df)
 hotel_ID = input("Enter the hotel id of the selected hotel: ")
-hotel = Hotel(hotel_ID)
+hotel = SpaHotel(hotel_ID)
 
 if hotel.available():
     credit_card = CreditCardSecurity(number="1234", expiration="12/26", holder="JOHN SMITH", cvc="123")
@@ -103,6 +122,11 @@ if hotel.available():
                 reservation_date = input("Enter the date you want to check in: ")
                 reservation_ticket = ReservationTicket(hotel_match=hotel, customer_name=name, date=reservation_date)
                 print(reservation_ticket.generate())
+                spa_package = input("Do you want to book a spa package? ")
+                if spa_package == "yes":
+                    hotel.book_spa_package()
+                    spa_ticket = SpaTicket(name,hotel_match=hotel)
+                    print(spa_ticket.generate())
             else:
                 print("You don't have sufficient balance")
         else:
