@@ -1,4 +1,5 @@
 import pandas
+from fpdf import FPDF
 
 df = pandas.read_csv("hotels.csv", dtype={"id": str, "price_per_room":int})
 df_cards = pandas.read_csv("cards.csv", dtype=str).to_dict(orient="records")
@@ -100,6 +101,62 @@ class SpaTicket:
         Hotel: {self.hotel.name}
         """
         return message
+
+class pdf(ReservationTicket):
+    def __init__(self, customer_name, date, hotel_match, spa_package):
+        super().__init__(customer_name, date, hotel_match)  # Initialize the parent class
+        self.spa_package = spa_package
+         
+    def generate(self):
+        if self.spa_package == "yes":
+            pdf =FPDF(orientation="P", unit="mm", format="A4")
+            pdf.add_page()
+
+            pdf.set_font(family="Times", style="B", size=16)
+            pdf.set_text_color(0, 0, 0)
+            pdf.cell(w=0, h=14, txt=self.hotel.name, align="C",
+                ln=1)
+            pdf.line(10, 21, 200, 21)
+
+            pdf.set_font(family="Times", size=12, style="B")
+            pdf.cell(w=50, h=12, txt=f"Thank you for your reservation", ln=1)
+
+            pdf.set_font(family="Times", size=12, style="B")
+            pdf.cell(w=50, h=12, txt=f"Here is your Hotel booking data:", ln=1)
+
+            pdf.set_font(family="Times", size=12, style="B")
+            pdf.cell(w=50, h=12, txt=f"Name: {self.customer_name}", ln=1)
+
+            pdf.set_font(family="Times", size=12, style="B")
+            pdf.cell(w=50, h=12, txt=f"Check in date: {self.date}", ln=1)
+
+            pdf.set_font(family="Times", size=12, style="B")
+            pdf.cell(w=50, h=12, txt=f"You have a Spa Booking also.", ln=1)
+
+            pdf.output("receipt.pdf")
+        else:
+            pdf =FPDF(orientation="P", unit="mm", format="A4")
+            pdf.add_page()
+
+            pdf.set_font(family="Times", style="B", size=16)
+            pdf.set_text_color(0, 0, 0)
+            pdf.cell(w=0, h=14, txt=self.hotel.name, align="C",
+                ln=1)
+            pdf.line(10, 21, 200, 21)
+
+            pdf.set_font(family="Times", size=12, style="B")
+            pdf.cell(w=50, h=12, txt=f"Thank you for your reservation", ln=1)
+
+            pdf.set_font(family="Times", size=12, style="B")
+            pdf.cell(w=50, h=12, txt=f"Here is your Hotel booking data:", ln=1)
+
+            pdf.set_font(family="Times", size=12, style="B")
+            pdf.cell(w=50, h=12, txt=f"Name: {self.customer_name}", ln=1)
+
+            pdf.set_font(family="Times", size=12, style="B")
+            pdf.cell(w=50, h=12, txt=f"Check in date: {self.date}", ln=1)
+            pdf.output("receipt.pdf")
+        
         
         
 class Email:
@@ -127,6 +184,9 @@ if hotel.available():
                     hotel.book_spa_package()
                     spa_ticket = SpaTicket(name,hotel_match=hotel)
                     print(spa_ticket.generate())
+                pdf_generate = pdf(customer_name=name,date=reservation_date,hotel_match=hotel, spa_package=spa_package)
+                pdf_generate.generate()
+                
             else:
                 print("You don't have sufficient balance")
         else:
