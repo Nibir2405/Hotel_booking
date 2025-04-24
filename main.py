@@ -1,5 +1,10 @@
 import pandas
 from fpdf import FPDF
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email import encoders
 
 df = pandas.read_csv("hotels.csv", dtype={"id": str, "price_per_room":int})
 df_cards = pandas.read_csv("cards.csv", dtype=str).to_dict(orient="records")
@@ -160,8 +165,43 @@ class pdf(ReservationTicket):
         
         
 class Email:
-    def send(self):
-        pass
+    def __init__(self, sender_email, sender_password, recipient_email):
+        self.sender_email = sender_email
+        self.sender_password = sender_password
+        self.recipient_email = recipient_email
+
+    def send(self, subject, body, attachment_path):
+        try:
+            # Create the email message
+            msg = MIMEMultipart()
+            msg['From'] = self.sender_email
+            msg['To'] = self.recipient_email
+            msg['Subject'] = subject
+
+            # Attach the email body
+            msg.attach(MIMEText(body, 'plain'))
+
+            # Attach the PDF file
+            with open(attachment_path, 'rb') as attachment:
+                part = MIMEBase('application', 'octet-stream')
+                part.set_payload(attachment.read())
+                encoders.encode_base64(part)
+                part.add_header(
+                    'Content-Disposition',
+                    f'attachment; filename={attachment_path.split("/")[-1]}',
+                )
+                msg.attach(part)
+
+            # Connect to the SMTP server and send the email
+            with smtplib.SMTP('smtp.gmail.com', 587) as server:
+                server.starttls()
+                server.login(self.sender_email, self.sender_password)
+                server.send_message(msg)
+
+            print("A receipt of your booking has sent successfully to your email!")
+
+        except Exception as e:
+            print(f"Failed to send email: {e}")
 
 
 
@@ -187,6 +227,15 @@ if hotel.available():
                 pdf_generate = pdf(customer_name=name,date=reservation_date,hotel_match=hotel, spa_package=spa_package)
                 pdf_generate.generate()
                 
+                # After generating the PDF
+                email = Email(sender_email="navidulislam2002@gmail.com", 
+                              sender_password="eluyrpqrsoysflxj", 
+                              recipient_email="nibirislam56@gmail.com")
+
+                email.send(
+                    subject="Your Hotel Booking Receipt",
+                    body="Thank you for booking with us. Please find your receipt attached.",
+                    attachment_path="receipt.pdf")
             else:
                 print("You don't have sufficient balance")
         else:
