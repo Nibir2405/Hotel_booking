@@ -62,7 +62,7 @@ hotel-booking-cli/
 ├── [card_security.csv](http://_vscodecontentref_/2)      # Credit card security data
 ├── [main.py](http://_vscodecontentref_/3)                # Main application script
 └── README.md                                             # Project documentation
-└── requirements.txt                              # Project's requirements         
+└── requirements.txt                                      # Project's requirements         
 ```
 
 ---
