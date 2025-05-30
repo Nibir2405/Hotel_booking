@@ -1,6 +1,4 @@
-Here’s a sample `README.md` file for your Hotel Booking project:
 
-```markdown
 # Hotel Booking Project
 
 Welcome to the **Hotel Booking** project! This repository contains a Python-based application designed to manage hotel bookings efficiently. It provides features to add, manage, and retrieve booking details, making it suitable for small to medium-sized hotels.
